@@ -29,7 +29,32 @@ axios({
     data: {
         grant_type: "client_credentials"
     }
-}).then((response) => console.log(response.data.access_token))
+}).then((response) => {
+    const accessToken = response.data?.access_token;
+
+    const reqGN = axios.create({
+        baseURL: process.env.GN_ENDPOINT,
+        httpsAgent: agent,
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+        }
+    })
+
+    const dataCob = {
+        calendario: {
+            expiracao: 3600
+        },
+        valor: {
+            original: "100.00"
+        },
+        chave: "1d3a3370-e648-4c18-bf13-1b75721a5425",
+        solicitacaoPagador: "Paga ai troxa."
+    }
+
+    reqGN.post("/v2/cob", dataCob).then((response) => console.log(response.data))
+})
+
 
 // curl --request POST \
 //   --url https://api-pix-h.gerencianet.com.br/oauth/token \
